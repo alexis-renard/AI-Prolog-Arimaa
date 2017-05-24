@@ -23,9 +23,20 @@ Qui provoquent une erreur :
 * Gestion des pièges et de la capture ok
 * Le push est implémenté côté humain
 
-Todo :
-* Gestion du déplacement
-    * Elle bouffe tout ce qui se trouve sur sa case d'arrivée
-    * Aucune contrainte de déplacement
+### Todo
+* Movement possible ?
+    * N'est pas entourée d'une composition d'alliés et de bordures (une case adjacente est donc soit libre soit ennemie)
+    * Il y a une piece ennemie
+        * Est-elle plus forte ?
+            * A-t-on un voisin allié ?
+        * Est-elle bougeable ?
+    * La case est donc libre, il peut bouger (si il a assez de step)
+
+* Elle bouffe tout ce qui se trouve sur sa case d'arrivée
+* Aucune contrainte de déplacement
 * Du nombre de step par l'IA
 * Pas de pousse possible si on a moins
+
+### Done
+* Récupérer tous les voisins d'une case
+* Récupérer les pièces ennemies ou alliées  
