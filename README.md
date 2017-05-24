@@ -1,2 +1,2 @@
-# PrologIA-ArimaaGame
-Developping a Prolog IA for the Arimaa game !
+# PrologAI-ArimaaGame
+Developping a Prolog AI for the Arimaa game !
