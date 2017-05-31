@@ -64,14 +64,18 @@ testAllies(Res):-
 
 
 %%%%%% RECUPERER LES VOISINS %%%%%%
-% type : get_neighbours(Board,Resultat)
+% type : get_adjacent_case(Board,Resultat)
 % beware : le (0,0) est en haut à gauche
 
 
 %%%%% 1) On récupère les voisins directs d'une certaine case
+
 get_north([X,Y],[X,Yn]):-   Y>0,
                             Yn is Y-1.
 get_north([X,Y],[]).
+get_infos_north([X,Y],B,Res):-  get_north([X,Y],[X,Yn]),
+                                get_infos([X,Yn],B,Res).
+
 
 
 get_south([X,Y],[X,Ys]):-   Y<7,
@@ -91,10 +95,10 @@ get_west([X,Y],[]).
 
 %%%%% 2) On utilise les fonctions précédentes pour récupérer tous les voisins d'une case
 
-get_neighbours(C,[Cn,Ce,Cs,Cw]) :-  get_north(C,Cn),
-                                    get_east(C,Ce),
-                                    get_south(C,Cs),
-                                    get_west(C,Cw).
+get_adjacent_case(C,[Cn,Ce,Cs,Cw]) :-   get_north(C,Cn),
+                                        get_east(C,Ce),
+                                        get_south(C,Cs),
+                                        get_west(C,Cw).
 
 %%%%% 3) On épure cette liste grâce à notre fonction reduce (qui enlevera les listes vides)
 
@@ -103,26 +107,54 @@ reduce([[]|Q],R) :- reduce(Q,R).
 reduce([T|Q],[T|R]) :- reduce(Q,R).
 
 
-%%%%% TestNeighbours
-testNeighbours([X,Y],Res) :-    get_neighbours([X,Y],L),
-                                reduce(L,Res).
+%%%%% TestAdjacentCases
+testAdjacentCases([X,Y,_,_],Res) :- get_adjacent_case([X,Y,_,_],L),
+                                    reduce(L,Res).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%% ENVIRONNEMENT SATURE %%%%%%
+
+% env_sature(B,C):-   testAdjacentCases(C,Cadj).
+
+
+
+
+%Cadj pour Cadjacent
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 
 %%%%%% RECUPERER INFOS A PARTIR DES COORDONNEES %%%%%%
 
-get_infos([[Xi,_,_,_]|B],[X,Y],Res):- get_infos(B,[X,Y],Res).
-get_infos([[_,Yi,_,_]|B],[X,Y],Res):- get_infos(B,[X,Y],Res).
+% get_infos([],[X,Y,_,_],[]).
 
-get_infos([[X,Y,A,T]|B],[X,Y],[X,Y,A,T]).
+get_infos_onboard([[Xi,_,_,_]|B],[X,Y,_,_],Res):- get_infos_onboard(B,[X,Y,_,_],Res).
+get_infos_onboard([[_,Yi,_,_]|B],[X,Y,_,_],Res):- get_infos_onboard(B,[X,Y,_,_],Res).
+get_infos_onboard([[X,Y,A,T]|B],[X,Y,_,_],[X,Y,A,T]).
 
-testInfos(C,Res):-
-    board(B),
-    get_infos(B,C,Res).
+get_infos([X,Y],B,Res):-member([X,Y,_,_],B),
+                        get_infos_onboard(B,[X,Y,_,_],Res).
+get_infos([X,Y],B,[]).
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%% CASE VIDE %%%%%%
+
+vide([X,Y,_,_]):-   board(B),
+                    \+member([X,Y,_,_],B).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%% MOVE DE TEST %%%%%%
 get_moves([[[1,0],[2,0]],[[1,0],[2,2]],[[0,1],[0,0]],[[0,0],[0,1]]], Gamestate, Board).
 % get_moves([[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]], Gamestate, Board).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+usefulTest(C,Res):- board(B),
+                    get_infos_north(C,B,Res).

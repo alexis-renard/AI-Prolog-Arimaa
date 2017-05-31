@@ -24,13 +24,19 @@ Qui provoquent une erreur :
 * Le push est implémenté côté humain
 
 ### Todo
-* Movement possible ?
+* Déplacement possible ?
+    * Récupérer tous les voisins **DONE** (mais genre vraiment)
     * N'est pas entourée d'une composition d'alliés et de bordures (une case adjacente est donc soit libre soit ennemie)
     * Il y a une piece ennemie
         * Est-elle plus forte ?
             * A-t-on un voisin allié ?
         * Est-elle bougeable ?
     * La case est donc libre, il peut bouger (si il a assez de step)
+
+* Lister tous les mouvements possibles
+
+* Quel est le meilleur coup à jouer ?
+
 
 * Elle bouffe tout ce qui se trouve sur sa case d'arrivée
 * Aucune contrainte de déplacement
@@ -40,3 +46,4 @@ Qui provoquent une erreur :
 ### Done
 * Récupérer tous les voisins d'une case
 * Récupérer les pièces ennemies ou alliées  
+* Récupérer les infos d'une case en fonction de ses coordonnées
