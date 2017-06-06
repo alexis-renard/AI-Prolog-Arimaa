@@ -31,8 +31,13 @@ stronger(horse,dog).
 stronger(camel,horse).
 stronger(elephant,camel).
 
-stronger(X,Z):- stronger(X,Y),
+
+stronger(X,X).
+stronger(X,Z):- stronger(X,Y),      %%%%   probleme si X plus faible que Z!!!!!  %%%%%%%%
                 stronger(Y,Z).
+
+
+
 
 %%%%%% RECUPERER LES ENNEMIS %%%%%%
 % type : get_enemies(Board,Resultat)
@@ -66,10 +71,7 @@ testAllies(Res):-
 %%%%%% RECUPERER LES VOISINS %%%%%%
 % type : get_adjacent_case(Board,Resultat)
 % beware : le (0,0) est en haut à gauche
-
-
 %%%%% 1) On récupère les voisins directs d'une certaine case et ce qu'il y a dessus %%%%%%%%
-
 
 get_north([X,Y],[Xn,Y]):-   X>0,
                             Xn is X-1.
@@ -99,8 +101,6 @@ get_infos_south([],B,[]).
 get_west([X,Y],[X,Yw]):-   Y>0,
                             Yw is Y-1.
 get_west([X,Y],[]).
-
-
 get_infos_west([X,Y],B,Res):-  get_west([X,Y],Cw),
                                 get_infos(Cw,B,Res).
 get_infos_west([],B,[]).
@@ -122,7 +122,7 @@ reduce([[]|Q],R) :- reduce(Q,R).
 reduce([T|Q],[T|R]) :- reduce(Q,R).
 
 
-%%%%%%%%%%%%%%%%% TestAdjacentCases  %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% TestAdjacentCases  %%%%%%%%%%%%%%%%%%   Renvoie la liste épurée des voisins.
 testAdjacentCases(C,B,Res) :- get_adjacent_case(C,B,L),
                               reduce(L,Res).
 
@@ -145,13 +145,19 @@ env_sature(C,B):-   testAdjacentCases(C,B,Cadj),    %%recupere les coordonnées 
 
 
 
-%%%%%% RECUPERER INFOS A PARTIR DES COORDONNEES %%%%%%    PROBLEME QUAND COORDONNEES DE TYPE [0,_] !
+%%%%%% RECUPERER INFOS A PARTIR DES COORDONNEES %%%%%%             %%   fonctionne pas si coordonnees de la forme [1,_] !!!!!!%%
 
 % get_infos([],[X,Y,_,_],[]).
+
+
 
 get_infos_onboard([[Xi,_,_,_]|B],[X,Y,_,_],Res):- Xi \= X,  get_infos_onboard(B,[X,Y,_,_],Res).
 get_infos_onboard([[_,Yi,_,_]|B],[X,Y,_,_],Res):- Yi \= Y,  get_infos_onboard(B,[X,Y,_,_],Res).
 get_infos_onboard([[X,Y,A,T]|B],[X,Y,_,_],[X,Y,A,T]).
+
+
+
+
 
 
 get_infos([],B,[]).
@@ -179,5 +185,5 @@ vide([X,Y,_,_]):-   board(B),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 usefulTest(C, Res):- board(B),
-                    testAdjacentCases(C,B,Res).
+                    get_infos(C,B,Res).
                     
