@@ -10,6 +10,10 @@ L'état du plateau :
 [ligne, colonne, type, couleur]
 
 On a un plateau de 8x8 indicée de 0 à 7
+Trous en    [2,2]
+            [2,5]
+            [5,2]
+            [5,5]
 
 ## Move
 Retourner les 4 moves des pièces qui sont sous la forme :
@@ -23,13 +27,14 @@ Qui provoquent une erreur :
 * Gestion des pièges et de la capture ok
 * Le push est implémenté côté humain
 
+
 ### Todo
 * Déplacement possible ?
-    * Récupérer tous les voisins **DONE** (mais genre vraiment)
-    * N'est pas entourée d'une composition d'alliés et de bordures (une case adjacente est donc soit libre soit ennemie)
-    * Il y a une piece ennemie
-        * Est-elle plus forte ?
-            * A-t-on un voisin allié ?
+    * Récupérer tous les voisins **DONE** (mais genre vraiment vraiment)
+    * N'est pas entourée d'une composition d'alliés et de bordures (une case adjacente est donc soit libre soit ennemie) **DONE**
+    * Il y a une piece ennemie **DONE**
+        * Est-elle plus forte ? **DONE**
+            * A-t-on un voisin allié ? **DONE**
         * Est-elle bougeable ?
     * La case est donc libre, il peut bouger (si il a assez de step)
 
