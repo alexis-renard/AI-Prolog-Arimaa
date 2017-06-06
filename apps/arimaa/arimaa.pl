@@ -12,7 +12,7 @@
 % board: [[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[2,7,rabbit,gold],[6,0,cat,gold],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]
 
 % Call exemple:
-% get_moves(Moves, [silver, []], [[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[2,7,rabbit,gold],[6,0,cat,gold],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+ get_moves(Moves, [silver, []], [[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[2,7,rabbit,gold],[6,0,cat,gold],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %%%%%% SNIPPETS DU PROF %%%%%%
 % get_moves(Move, Gamestate, Board) :- coup_possible([Move|Y], Board).
@@ -24,7 +24,6 @@ board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,si
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 stronger(cat,rabbit).
 stronger(dog,cat).
 stronger(horse,dog).
@@ -32,9 +31,13 @@ stronger(camel,horse).
 stronger(elephant,camel).
 
 
-stronger(X,X).
-stronger(X,Z):- stronger(X,Y),      %%%%   probleme si X plus faible que Z!!!!!  %%%%%%%%
-                stronger(Y,Z).
+is_stronger(X,X).
+is_stronger(X,Y) :-stronger(X,Y).
+is_stronger(X,Z):- stronger(X,Y),      
+                    stronger(Y,Z).
+
+
+
 
 
 
@@ -130,7 +133,7 @@ testAdjacentCases(C,B,Res) :- get_adjacent_case(C,B,L),
 
 %%%%%% ENVIRONNEMENT SATURE %%%%%%
 
-env_sature(C,B):-   testAdjacentCases(C,B,Cadj),    %%recupere les coordonnées des cases adjacente
+%%%%%%env_sature(C,B):-   testAdjacentCases(C,B,Cadj),    %%recupere les coordonnées des cases adjacente
 
 
 
@@ -145,19 +148,13 @@ env_sature(C,B):-   testAdjacentCases(C,B,Cadj),    %%recupere les coordonnées 
 
 
 
-%%%%%% RECUPERER INFOS A PARTIR DES COORDONNEES %%%%%%             %%   fonctionne pas si coordonnees de la forme [1,_] !!!!!!%%
+%%%%%% RECUPERER INFOS A PARTIR DES COORDONNEES %%%%%%%
 
 % get_infos([],[X,Y,_,_],[]).
 
 
-
-get_infos_onboard([[Xi,_,_,_]|B],[X,Y,_,_],Res):- Xi \= X,  get_infos_onboard(B,[X,Y,_,_],Res).
-get_infos_onboard([[_,Yi,_,_]|B],[X,Y,_,_],Res):- Yi \= Y,  get_infos_onboard(B,[X,Y,_,_],Res).
-get_infos_onboard([[X,Y,A,T]|B],[X,Y,_,_],[X,Y,A,T]).
-
-
-
-
+get_infos_onboard([[X,Y,A,T]|B],[X,Y,_,_],[X,Y,A,T]):-!.
+get_infos_onboard([_|B],[X,Y,_,_],Res):-get_infos_onboard(B,[X,Y,_,_], Res).
 
 
 get_infos([],B,[]).
@@ -185,5 +182,5 @@ vide([X,Y,_,_]):-   board(B),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 usefulTest(C, Res):- board(B),
-                    get_infos(C,B,Res).
+                    testAdjacentCases(C,B,Res).
                     
