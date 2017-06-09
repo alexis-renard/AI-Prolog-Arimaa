@@ -41,6 +41,7 @@ Qui provoquent une erreur :
 * Lister tous les mouvements possibles
 
 * Quel est le meilleur coup à jouer ?
+    * Si on peut push/pull la piece ennemie dans un trou, on le fait (clever_pushable)
 
 
 * Elle bouffe tout ce qui se trouve sur sa case d'arrivée
