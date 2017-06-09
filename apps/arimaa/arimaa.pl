@@ -21,7 +21,7 @@
 
 %%%%%% INITIALISATION %%%%%%
 %The little one
-board([[0,0,rabbit,silver],[4,1,horse,gold],[0,2,horse,silver]]).
+board([[0,0,rabbit,silver],[1,1,horse,silver],[0,2,horse,silver]]).
 
 
 %The original one
@@ -205,12 +205,13 @@ vide([X,Y,_,_]):-   board(B),
 
 %%%%%% MOUVEMENT D'UNE PIECE - DIRECTION %%%%%%%%%%%%%%
 
-possible_move_per_piece_north([X,Y,A,T],B,[]):- border_north([X,Y]).
+possible_move_per_piece_north([X,Y,A,T],B,[]):- border_north([X,Y]).   %%Cas bordures
 
-possible_move_per_piece_north([X,Y,A,T],B,[]):- get_north([X,Y],Cn),
-                                                hole(Cn).
+possible_move_per_piece_north([X,Y,A,T],B,[]):- get_north([X,Y],Cn),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
+                                                hole(Cn),
+                                                \+ at_least_one_ally(Cn,B).
 
-possible_move_per_piece_north([X,Y,A,T],B,[]):- get_infos_north([X,Y],B,Cn),
+possible_move_per_piece_north([X,Y,A,T],B,[]):- get_infos_north([X,Y],B,Cn),  %%Cas piece alliée au nord
                                                 member(silver,Cn).
 
 % On est dans le cas où on a une case vide, ou un ennemi
@@ -265,7 +266,7 @@ stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
 
 
 %%%%%% MOUVEMENT D'UNE PIECE %%%%%%%%%%%%%%
-possible_move_per_piece([X,Y,A,T],B,[]):-   stucked([X,Y,A,T],B).
+possible_move_per_piece([X,Y,A,T],B,[]):-   stucked([X,Y,A,T],B).        %Done
 
 possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-    possible_move_per_piece_north([X,Y,A,T],B,Cn),
                                                         possible_move_per_piece_east([X,Y,A,T],B,Ce),
@@ -283,4 +284,6 @@ possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-    possible_move_per_piece_
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 usefulTest([X,Y,A,T], Res):-    board(B),
-                                stucked([X,Y,A,T],B).
+                                get_north([X,Y],Cn),       %%Cas trou sans alliée
+                                                hole(Cn),
+                                                \+ at_least_one_ally(Cn,B).

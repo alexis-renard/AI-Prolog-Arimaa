@@ -35,7 +35,7 @@ Qui provoquent une erreur :
     * Il y a une piece ennemie **DONE**
         * Est-elle plus forte ? **DONE**
             * A-t-on un voisin allié ? **DONE**
-        * Est-elle bougeable ?
+        * Est-elle bougeable ?  **DONE**
     * La case est donc libre, il peut bouger (si il a assez de step)
 
 * Lister tous les mouvements possibles
