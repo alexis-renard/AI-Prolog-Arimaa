@@ -21,14 +21,14 @@
 
 %%%%%% INITIALISATION %%%%%%
 %The little one
-% board([[0,0,rabbit,silver],[0,1,horse,gold],[0,2,horse,silver]]).
+board([[0,0,rabbit,silver],[4,1,horse,gold],[0,2,horse,silver]]).
 
 
 %The original one
-% board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+ %board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %The custom one
-board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+%board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -232,9 +232,15 @@ possible_move_per_piece_north([X,Y,A,T],B,[]):- get_infos_north([X,Y],B,[_,_,An,
 stucked_by_north([X,Y,A,T],B):- get_infos_north([X,Y],B,[_,_,An,Tn]),
                                 gold = Tn,
                                 \+is_stronger(A,An).
-% stucked_by_east
-% stucked_by_south
-% stucked_by_west
+stucked_by_east([X,Y,A,T],B):- get_infos_east([X,Y],B,[_,_,Ae,Te]),
+                                gold = Te,
+                                \+is_stronger(A,Ae).
+stucked_by_south([X,Y,A,T],B):- get_infos_south([X,Y],B,[_,_,As,Ts]),
+                                gold = Ts,
+                                \+is_stronger(A,As).
+stucked_by_west([X,Y,A,T],B):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),
+                                gold = Tw,
+                                \+is_stronger(A,Aw).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%% STUCKED - DIRECTION %%%%%%%%%%%%%%
@@ -247,12 +253,13 @@ at_least_one_ally([X,Y],B):-    get_adjacent_case([X,Y],B,Res),
 % PIECE BLOQUEE PAR ENNEMI PLUS FORT
 stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
                         stucked_by_north([X,Y,A,T],B).
-% stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
-%                         stucked_by_east([X,Y],B).
-% stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
-%                         stucked_by_south([X,Y],B).
-% stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
-%                         stucked_by_west([X,Y],B).
+stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
+                        stucked_by_east([X,Y,A,T],B).
+
+stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
+                        stucked_by_south([X,Y,A,T],B).
+stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
+                       stucked_by_west([X,Y,A,T],B).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
