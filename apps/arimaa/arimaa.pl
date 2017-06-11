@@ -114,36 +114,36 @@ testAllies(Res):-
 %%% NORTH
 get_north([X,Y],[Xn,Y]):-   X>0,
                             Xn is X-1.
-get_north([X,Y],[]).
+get_north([_,_],[]).
 
 get_infos_north([X,Y],B,Res):-  get_north([X,Y],Cn),
                                 get_infos(Cn,B,Res).
-get_infos_north([],B,[]).
+get_infos_north([],_,[]).
 
 %%% EAST
 get_east([X,Y],[X,Ye]):-   Y<7,
                             Ye is Y+1.
-get_east([X,Y],[]).
+get_east([_,_],[]).
 get_infos_east([X,Y],B,Res):-   get_east([X,Y],Ce),
                                 get_infos(Ce,B,Res).
-get_infos_east([],B,[]).
+get_infos_east([],_,[]).
 
 
 %%% SOUTH
 get_south([X,Y],[Xs,Y]):-   X<7,
                             Xs is X+1.
-get_south([X,Y],[]).
+get_south([_,_],[]).
 get_infos_south([X,Y],B,Res):-  get_south([X,Y],Cs),
                                 get_infos(Cs,B,Res).
-get_infos_south([],B,[]).
+get_infos_south([],_,[]).
 
 %%% WEST
 get_west([X,Y],[X,Yw]):-   Y>0,
                             Yw is Y-1.
-get_west([X,Y],[]).
+get_west([_,_],[]).
 get_infos_west([X,Y],B,Res):-  get_west([X,Y],Cw),
                                 get_infos(Cw,B,Res).
-get_infos_west([],B,[]).
+get_infos_west([],_,[]).
 
 
 %%%%% 2) On utilise les fonctions précédentes pour récupérer tous les voisins d'une case   %%%%%%%%%%%
@@ -195,14 +195,14 @@ env_sature(C,B):-   get_adjacent_case(C,B,Cadj),    %%recupere les coordonnées 
 % get_infos([],[X,Y,_,_],[]).
 
 
-get_infos_onboard([[X,Y,A,T]|B],[X,Y,_,_],[X,Y,A,T]):-!.
+get_infos_onboard([[X,Y,A,T]|_],[X,Y,_,_],[X,Y,A,T]):-!.
 get_infos_onboard([_|B],[X,Y,_,_],Res):-get_infos_onboard(B,[X,Y,_,_], Res).
 
 
-get_infos([],B,[]).
+get_infos([],_,[]).
 get_infos([X,Y],B,Res):-member([X,Y,_,_],B),
                         get_infos_onboard(B,[X,Y,_,_],Res).
-get_infos([X,Y],B,[]).
+get_infos([_,_],_,[]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -219,71 +219,71 @@ vide([X,Y,_,_]):-   board(B),
 
 
 %% NORTH
-possible_move_per_piece_north([X,Y,A,T],B,[]):- border_north([X,Y]).   %%Cas bordures
-possible_move_per_piece_north([X,Y,A,T],B,[]):- get_north([X,Y],Cn),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
+possible_move_per_piece_north([X,Y,_,_],_,[]):- border_north([X,Y]).   %%Cas bordures
+possible_move_per_piece_north([X,Y,_,_],B,[]):- get_north([X,Y],Cn),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
                                                 hole(Cn),
                                                 \+ at_least_one_ally(Cn,B).
-possible_move_per_piece_north([X,Y,A,T],B,[]):- get_infos_north([X,Y],B,[_,_,An,Tn]),  %%Cas piece alliée au nord
+possible_move_per_piece_north([X,Y,_,_],B,[]):- get_infos_north([X,Y],B,[_,_,_,Tn]),  %%Cas piece alliée au nord
                                                 silver = Tn.
-possible_move_per_piece_north([X,Y,A,T],B,[]):- get_infos_north([X,Y],B,[_,_,An,Tn]), % Cas où on a une case vide, ou un ennemi
+possible_move_per_piece_north([X,Y,A,_],B,[]):- get_infos_north([X,Y],B,[_,_,An,Tn]), % Cas où on a une case vide, ou un ennemi
                                                 gold = Tn,
                                                 \+is_stronger(A,An).
 
-possible_move_per_piece_north([X,Y,A,T],B,Cn):- get_north([X,Y],Cn).
+possible_move_per_piece_north([X,Y,_,_],_,Cn):- get_north([X,Y],Cn).
 
 % EAST
-possible_move_per_piece_east([X,Y,A,T],B,[]):- border_east([X,Y]).   %%Cas bordures
-possible_move_per_piece_east([X,Y,A,T],B,[]):- get_east([X,Y],Ce),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
+possible_move_per_piece_east([X,Y,_,_],_,[]):- border_east([X,Y]).   %%Cas bordures
+possible_move_per_piece_east([X,Y,_,_],B,[]):- get_east([X,Y],Ce),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
                                                 hole(Ce),
                                                 \+ at_least_one_ally(Ce,B).
-possible_move_per_piece_east([X,Y,A,T],B,[]):- get_infos_east([X,Y],B,[_,_,Ae,Te]),  %%Cas piece alliée au nord
+possible_move_per_piece_east([X,Y,_,_],B,[]):- get_infos_east([X,Y],B,[_,_,_,Te]),  %%Cas piece alliée au nord
                                                 silver = Te.
-possible_move_per_piece_east([X,Y,A,T],B,[]):- get_infos_east([X,Y],B,[_,_,Ae,Te]),% Cas où on a une case vide, ou un ennemi
+possible_move_per_piece_east([X,Y,A,_],B,[]):- get_infos_east([X,Y],B,[_,_,Ae,Te]),% Cas où on a une case vide, ou un ennemi
                                                 gold = Te,
                                                 \+is_stronger(A,Ae).
 
-possible_move_per_piece_east([X,Y,A,T],B,Ce):- get_east([X,Y],Ce).
+possible_move_per_piece_east([X,Y,_,_],_,Ce):- get_east([X,Y],Ce).
 
 % SOUTH
-possible_move_per_piece_south([X,Y,A,T],B,[]):- border_south([X,Y]).   %%Cas bordures
-possible_move_per_piece_south([X,Y,A,T],B,[]):- get_south([X,Y],Cs),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
+possible_move_per_piece_south([X,Y,_,_],_,[]):- border_south([X,Y]).   %%Cas bordures
+possible_move_per_piece_south([X,Y,_,_],B,[]):- get_south([X,Y],Cs),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
                                                 hole(Cs),
                                                 \+ at_least_one_ally(Cs,B).
-possible_move_per_piece_south([X,Y,A,T],B,[]):- get_infos_south([X,Y],B,[_,_,As,Ts]),  %%Cas piece alliée au nord
+possible_move_per_piece_south([X,Y,_,_],B,[]):- get_infos_south([X,Y],B,[_,_,_,Ts]),  %%Cas piece alliée au nord
                                                 silver = Ts.
-possible_move_per_piece_south([X,Y,A,T],B,[]):- get_infos_south([X,Y],B,[_,_,As,Ts]),% Cas où on a une case vide, ou un ennemi
+possible_move_per_piece_south([X,Y,A,_],B,[]):- get_infos_south([X,Y],B,[_,_,As,Ts]),% Cas où on a une case vide, ou un ennemi
                                                 gold = Ts,
                                                 \+is_stronger(A,As).
 
-possible_move_per_piece_south([X,Y,A,T],B,Cs):- get_south([X,Y],Cs).
+possible_move_per_piece_south([X,Y,_,_],_,Cs):- get_south([X,Y],Cs).
 
 % WEST
-possible_move_per_piece_west([X,Y,A,T],B,[]):- border_west([X,Y]).   %%Cas bordures
-possible_move_per_piece_west([X,Y,A,T],B,[]):- get_west([X,Y],Cw),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
+possible_move_per_piece_west([X,Y,_,_],_,[]):- border_west([X,Y]).   %%Cas bordures
+possible_move_per_piece_west([X,Y,_,_],B,[]):- get_west([X,Y],Cw),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
                                                 hole(Cw),
                                                 \+ at_least_one_ally(Cw,B).
-possible_move_per_piece_west([X,Y,A,T],B,[]):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),  %%Cas piece alliée au nord
+possible_move_per_piece_west([X,Y,_,_],B,[]):- get_infos_west([X,Y],B,[_,_,_,Tw]),  %%Cas piece alliée au nord
                                                 silver = Tw.
-possible_move_per_piece_west([X,Y,A,T],B,[]):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),% Cas où on a une case vide, ou un ennemi
+possible_move_per_piece_west([X,Y,A,_],B,[]):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),% Cas où on a une case vide, ou un ennemi
                                                 gold = Tw,
                                                 \+is_stronger(A,Aw).
 
-possible_move_per_piece_west([X,Y,A,T],B,Cw):- get_west([X,Y],Cw).
+possible_move_per_piece_west([X,Y,_,_],_,Cw):- get_west([X,Y],Cw).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%% STUCKED - DIRECTION %%%%%%%%%%%%%%
-stucked_by_north([X,Y,A,T],B):- get_infos_north([X,Y],B,[_,_,An,Tn]),
+stucked_by_north([X,Y,A,_],B):- get_infos_north([X,Y],B,[_,_,An,Tn]),
                                 gold = Tn,
                                 \+is_stronger(A,An).
-stucked_by_east([X,Y,A,T],B):- get_infos_east([X,Y],B,[_,_,Ae,Te]),
+stucked_by_east([X,Y,A,_],B):- get_infos_east([X,Y],B,[_,_,Ae,Te]),
                                 gold = Te,
                                 \+is_stronger(A,Ae).
-stucked_by_south([X,Y,A,T],B):- get_infos_south([X,Y],B,[_,_,As,Ts]),
+stucked_by_south([X,Y,A,_],B):- get_infos_south([X,Y],B,[_,_,As,Ts]),
                                 gold = Ts,
                                 \+is_stronger(A,As).
-stucked_by_west([X,Y,A,T],B):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),
+stucked_by_west([X,Y,A,_],B):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),
                                 gold = Tw,
                                 \+is_stronger(A,Aw).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -321,7 +321,7 @@ possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-    possible_move_per_piece_
 
 %%%%%% TOUS LES MOUVEMENTS POSSIBLES PAR L'IA %%%%%%%%%%%%%%
 
-get_all_moves_helper([],B,[]).
+get_all_moves_helper([],_,[]).
 get_all_moves_helper([T|Q],B,[T2|Res]):-    possible_move_per_piece(T,B,T2),
                                             get_all_moves_helper(Q,B,Res).
 
@@ -335,6 +335,6 @@ usefulTest(Res):-   board(B),
                     get_all_moves(B,Res).
 
 %%%%%% MOVE DE TEST %%%%%%
-get_moves([[[1,0],[2,0]],[[1,0],[2,2]],[[0,1],[0,0]],[[0,0],[0,1]]], Gamestate, Board).
+get_moves([[[1,0],[2,0]],[[1,0],[2,2]],[[0,1],[0,0]],[[0,0],[0,1]]], _, _).
 % get_moves([[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]], Gamestate, Board).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
