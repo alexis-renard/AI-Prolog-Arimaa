@@ -7,11 +7,27 @@
 
 % declare the dynamic fact
 :- dynamic moves/1.
+:- dynamic cpt/1.
+
 %predicat to add a new move to the list of moves
 add_move(NewMove) :-
     moves(M),
     retract(moves(M)),
     asserta(moves([NewMove|M])).
+
+change_cpt(Number):-
+    cpt(Number).
+
+update_cpt(Value):-
+    cpt(Number),
+    retract(cpt(Number)),
+    asserta(Value).
+
+increment_cpt(Value):-
+    cpt(Number),
+
+    retract(cpt(Number)),
+    asserta(Value).
 
 % init moves with an empty list, add a new move to this list, return the new moves with the added move
 % test(M) :- asserta(moves([])), add_move([[1,0],[2,0]]), moves(M).
@@ -36,9 +52,9 @@ add_move(NewMove) :-
 
 %%%%%% INITIALISATION %%%%%%
 %The little one
-board([[0,0,rabbit,silver]]).
+% board([[0,0,rabbit,silver]]).
 % board([[0,0,rabbit,silver],[1,1,horse,silver]]).
-% board([[0,0,rabbit,silver],[1,2,horse,silver],[0,2,horse,silver]]).
+board([[0,0,rabbit,silver],[1,2,horse,silver],[0,2,horse,silver]]).
 
 
 %The original one
@@ -423,53 +439,74 @@ get_all_moves(B,Res):-
     get_allies(B,ListAllies),
     get_all_moves_helper(ListAllies,B,Res).
 
+%%%%%% MOVE DE TEST %%%%%%
+% choose_move(Board,PossibleMoves,[[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
+
+
+add_move_piece(_,[]).
+% add_move_piece(PieceCoord,[Choice|_],4):-
+%     add_move([PieceCoord,Choice]).
+add_move_piece(PieceCoord,[Choice|ChoicesLeft]):-
+    % print("first2"),
+    add_move([PieceCoord,Choice]),
+    retract(cpt(StepLeft)),
+    StepLeft2 is StepLeft+1,
+    asserta(cpt(StepLeft2)),
+    StepLeft2<4,
+    add_move_piece(PieceCoord,ChoicesLeft).
+
+
+% choose_move([[[X,Y,_,_]|[LastChoice|_]]|_]):-
+%     add_move([[X,Y],LastChoice]).
+choose_move([[[X,Y,_,_]|PossibleChoices]|PossibleMoves]):-
+    % print("first"),
+    add_move_piece([X,Y],PossibleChoices),
+    cpt(StepLeft),
+    % print("Coucou ("),
+    % print(StepLeft),
+    % print(")"),
+    StepLeft < 4,
+    choose_move(PossibleMoves).
+choose_move(_).
+
+% get_moves([[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[1,3]],[[0,0],[1,0]],[[0,0],[0,1]]], _, Board):-
+get_moves(Move, _, Board):-
+    % retractall(moves()),
+    % retractall(cpt()),
+    get_all_moves(Board,PossibleMoves),
+    asserta(moves([])),
+    asserta(cpt(0)),
+    choose_move(PossibleMoves),
+    % add_move([[1,0],[2,0]]),
+    % add_move([[0,0],[1,0]]),
+    % add_move([[0,1],[0,0]]),
+    % add_move([[0,0],[0,1]]),
+    moves(Move),
+    retract(moves(Move)),
+    cpt(Cpt),
+    retract(cpt(Cpt)).
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 usefulTest(Move):-  board(B),
                     get_all_moves(B,PossibleMoves),
                     asserta(moves([])),
-                    choose_move(B,PossibleMoves,4),
+                    asserta(cpt(0)),
+                    choose_move(PossibleMoves),
                     % add_move([[1,0],[2,0]]),
                     % add_move([[0,0],[1,0]]),
                     % add_move([[0,1],[0,0]]),
                     % add_move([[0,0],[0,1]]),
                     % choose_move(B,PossibleMoves,4),
-                    moves(Move).
-
-
-%%%%%% MOVE DE TEST %%%%%%
-% choose_move(Board,PossibleMoves,[[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
-
-
-add_move_piece(_,_,5).
-add_move_piece(_,[],_).
-add_move_piece(PieceCoord,[Choice|ChoicesLeft],N):-
-    add_move([PieceCoord,Choice]),
-    N2 is N+1,
-    add_move_piece(PieceCoord,ChoicesLeft,N2).
-
-
-choose_move(_,[[[X,Y,_,_]|[LastChoice|_]]|_],4):-
-    add_move([[X,Y],LastChoice]).
-choose_move(Board,[[[X,Y,_,_]|PossibleChoices]|PossibleMoves],StepLeft):-
-    add_move_piece([X,Y],PossibleChoices,StepLeft),
-    StepLeft < 5,
-    choose_move(Board,PossibleMoves,StepLeft).
-choose_move(_,_,_).
-
-get_moves(Move, _, Board):-
-    get_all_moves(Board,PossibleMoves),
-    asserta(moves([])),
-    add_move_piece(Board,PossibleMoves,0),
-    % add_move([[1,0],[2,0]]),
-    % add_move([[0,0],[1,0]]),
-    % add_move([[0,1],[0,0]]),
-    % add_move([[0,0],[0,1]]),
-    % choose_move(Board,PossibleMoves,4),
-    moves(Move).
-
-
+                    moves(Move),
+                    retract(moves(Move)),
+                    cpt(Cpt),
+                    retract(cpt(Cpt)).
+                    % print("Move2"),
+                    % print(Move).
 
 % get_moves(Move, Gamestate, Board):-
 %     get_all_moves(Board,PossibleMoves),
