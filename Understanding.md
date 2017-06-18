@@ -75,3 +75,22 @@ Qui provoquent une erreur :
 * Récupérer tous les voisins d'une case
 * Récupérer les pièces ennemies ou alliées  
 * Récupérer les infos d'une case en fonction de ses coordonnées
+
+
+Points des moves pour Min/Max :
+- 100 points pour faire tomber une pièce ennemie dans un trou
+- 80 points pour mettre une pièce ennemie dans un trou même si elle ne tombe pas (ça va la bloquer)
+- 50  points pour aller secourir une pièce en danger.
+- 50 points pour aller mettre une pièce ennemie en danger.
+- 30 points pour aller mettre une pièce ennemie près d'un trou.
+- 20 points pour avancer un lapin vers une pièce alliée plus forte.
+- 20 points pour avancer notre éléphant à côté d'un trou.
+- -1000000 point pour rendre une de nos pièces en danger
+
+
+
+
+
+
+
+>>>>>>> 454c6d71a3bbe968c3b075960efc717aa0212303
