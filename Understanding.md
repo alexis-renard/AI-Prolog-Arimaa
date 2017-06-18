@@ -36,12 +36,32 @@ Qui provoquent une erreur :
         * Est-elle plus forte ? **DONE**
             * A-t-on un voisin allié ? **DONE**
         * Est-elle bougeable ?  **DONE**
-    * La case est donc libre, il peut bouger (si il a assez de step)
+    * La case est donc libre, il peut bouger (si il a assez de step)  **DONE**
 
-* Lister tous les mouvements possibles
+* Lister tous les mouvements possibles  **DONE**
 
 * Quel est le meilleur coup à jouer ?
     * Si on peut push/pull la piece ennemie dans un trou, on le fait (clever_pushable)
+
+
+
+
+
+###PUSH :
+	* 2 Steps :
+		- Premier on déplace la pièce ennemie vers une case adjacente
+		- Deuxième on avance vers la case d'origine de la pièce ennemie.
+
+	* Peut Push si notre pièce est plus forte que celle de l'adversaire.
+
+
+###PULL :
+	* 2 Steps :
+		- Premier on recule d'une case.
+		- Deuxième la pièce ennemie est tirée vers notre case d'origine.
+
+	* Peut Pull si notre pièce est plus forte que celle de l'adversaire.
+
 
 
 * Elle bouffe tout ce qui se trouve sur sa case d'arrivée
