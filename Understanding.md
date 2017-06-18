@@ -40,8 +40,10 @@ Qui provoquent une erreur :
 
 * Lister tous les mouvements possibles
 
-* Quel est le meilleur coup à jouer ?
-    * Si on peut push/pull la piece ennemie dans un trou, on le fait (clever_pushable)
+* Bons coups à jouer
+    * Si on peut gagner (mener un lapin à une position gagnante)
+    * Si on peut push/pull la piece ennemie dans un trou
+    * Si on peut sauver une piece alliée de se faire pousser dans un trou
 
 
 * Elle bouffe tout ce qui se trouve sur sa case d'arrivée

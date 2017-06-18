@@ -5,13 +5,15 @@
 %%pour afficher toute la réponse et non uniquement le début
 %%set_prolog_flag(answer_write_options,[max_depth(0)]).
 
-% % declare the dynamic fact
-% :- dynamic moves/1.
-%
-% % predicat to add a new move to the list of moves
-% add_move(NewMove) :- moves(M), retract(moves(M)), asserta(moves([NewMove|M])).
-%
-% % init moves with an empty list, add a new move to this list, return the new moves with the added move
+% declare the dynamic fact
+:- dynamic moves/1.
+%predicat to add a new move to the list of moves
+add_move(NewMove) :-
+    moves(M),
+    retract(moves(M)),
+    asserta(moves([NewMove|M])).
+
+% init moves with an empty list, add a new move to this list, return the new moves with the added move
 % test(M) :- asserta(moves([])), add_move([[1,0],[2,0]]), moves(M).
 
 
@@ -45,6 +47,11 @@ board([[0,0,rabbit,silver],[1,1,horse,silver],[0,2,horse,silver],[2,3,horse,silv
 %board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%% EMPTY  %%%%%%
+emptyList([]).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%% IS_STRONGER  %%%%%%
 stronger(cat,rabbit).
@@ -164,8 +171,6 @@ reduce([],[]).
 reduce([[]|Q],R) :- reduce(Q,R).
 reduce([T|Q],[T|R]) :- reduce(Q,R).
 
-
-%%%%%%%%%%%%%%%%% get_adjacent_case_reduced  %%%%%%%%%%%%%%%%%%   Renvoie la liste épurée des voisins.
 get_adjacent_case_reduced(C,B,Res) :-   get_adjacent_case(C,B,L),
                                         reduce(L,Res).
 
@@ -291,7 +296,7 @@ stucked_by_west([X,Y,A,_],B):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),
                                 \+is_stronger(A,Aw).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%% STUCKED - DIRECTION %%%%%%%%%%%%%%
+%%%%%% Test pour savoir si un allié nous permet de bouger %%%%%%%%%%%%%%
 at_least_one_ally([X,Y],B):-    get_adjacent_case([X,Y],B,Res),
                                 member([_,_,_,silver],Res).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -312,7 +317,7 @@ stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%% MOUVEMENT D'UNE PIECE %%%%%%%%%%%%%%
+%%%%%% MOUVEMENT D'UNE PIECE SUR UN STEP %%%%%%%%%%%%%%
 possible_move_per_piece([X,Y,A,T],B,[]):-   stucked([X,Y,A,T],B).        %Done
 
 possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-
@@ -326,8 +331,9 @@ possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-
 %%%%%% TOUS LES MOUVEMENTS POSSIBLES PAR L'IA %%%%%%%%%%%%%%
 
 get_all_moves_helper([],_,[]).
-get_all_moves_helper([T|Q],B,[T2|Res]):-
-    possible_move_per_piece(T,B,T2),
+get_all_moves_helper([ActualPiece|Q],B,[[ActualPiece|ChoicesReduced]|Res]):-
+    possible_move_per_piece(ActualPiece,B,Choices),
+    reduce(Choices,ChoicesReduced), %on enlève nos cases vides
     get_all_moves_helper(Q,B,Res).
 
 get_all_moves(B,Res):-
@@ -337,15 +343,53 @@ get_all_moves(B,Res):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usefulTest(Res):-   board(B),
-                    get_all_moves(B,Res).
+usefulTest(Move):-  board(B),
+                    get_all_moves(B,PossibleMoves),
+                    asserta(moves([])),
+                    choose_move(B,PossibleMoves,4),
+                    % add_move([[1,0],[2,0]]),
+                    % add_move([[0,0],[1,0]]),
+                    % add_move([[0,1],[0,0]]),
+                    % add_move([[0,0],[0,1]]),
+                    % choose_move(B,PossibleMoves,4),
+                    moves(Move).
 
 %%%%%% MOVE DE TEST %%%%%%
-choose_move(Board,PossibleMoves,[[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
+% choose_move(Board,PossibleMoves,[[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
 
-get_moves(Move, Gamestate, Board):-
+
+add_move_piece(_,_,5).
+add_move_piece(_,[],_).
+add_move_piece(PieceCoord,[Choice|ChoicesLeft],N):-
+    add_move([PieceCoord,Choice]),
+    N2 is N+1,
+    add_move_piece(PieceCoord,ChoicesLeft,N2).
+
+
+choose_move(_,[[[X,Y,_,_]|LastChoice]|_],4):-
+    add_move([[X,Y],LastChoice]).
+choose_move(Board,[[[X,Y,_,_]|PossibleChoices]|PossibleMoves],StepLeft):-
+    add_move_piece([X,Y],PossibleChoices,StepLeft),
+    StepLeft < 5,
+    choose_move(Board,PossibleMoves,StepLeft).
+choose_move(_,_,_).
+
+get_moves(Move, _, Board):-
     get_all_moves(Board,PossibleMoves),
-    choose_move(Board,PossibleMoves,Move).
+    asserta(moves([])),
+    choose_move(Board,PossibleMoves,0),
+    % add_move([[1,0],[2,0]]),
+    % add_move([[0,0],[1,0]]),
+    % add_move([[0,1],[0,0]]),
+    % add_move([[0,0],[0,1]]),
+    % choose_move(Board,PossibleMoves,4),
+    moves(Move).
+
+
+
+% get_moves(Move, Gamestate, Board):-
+%     get_all_moves(Board,PossibleMoves),
+%     choose_move(Board,PossibleMoves,Move).
 
 % get_moves([[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]], Gamestate, Board).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
