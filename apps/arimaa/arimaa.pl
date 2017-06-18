@@ -2,6 +2,9 @@
       [  get_moves/3
       ]).
 
+%%pour afficher toute la réponse et non uniquement le début
+%%set_prolog_flag(answer_write_options,[max_depth(0)]).
+
 % % declare the dynamic fact
 % :- dynamic moves/1.
 %
@@ -32,7 +35,7 @@
 %%%%%% INITIALISATION %%%%%%
 %The little one
 % board([[0,0,rabbit,silver],[1,1,horse,silver]]).
-% board([[0,0,rabbit,silver],[1,1,horse,silver],[0,2,horse,silver],[2,3,horse,silver]]).
+board([[0,0,rabbit,silver],[1,1,horse,silver],[0,2,horse,silver],[2,3,horse,silver]]).
 
 
 %The original one
@@ -312,21 +315,24 @@ stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
 %%%%%% MOUVEMENT D'UNE PIECE %%%%%%%%%%%%%%
 possible_move_per_piece([X,Y,A,T],B,[]):-   stucked([X,Y,A,T],B).        %Done
 
-possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-    possible_move_per_piece_north([X,Y,A,T],B,Cn),
-                                                        possible_move_per_piece_east([X,Y,A,T],B,Ce),
-                                                        possible_move_per_piece_south([X,Y,A,T],B,Cs),
-                                                        possible_move_per_piece_west([X,Y,A,T],B,Cw).
+possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-
+    possible_move_per_piece_north([X,Y,A,T],B,Cn),
+    possible_move_per_piece_east([X,Y,A,T],B,Ce),
+    possible_move_per_piece_south([X,Y,A,T],B,Cs),
+    possible_move_per_piece_west([X,Y,A,T],B,Cw).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%% TOUS LES MOUVEMENTS POSSIBLES PAR L'IA %%%%%%%%%%%%%%
 
 get_all_moves_helper([],_,[]).
-get_all_moves_helper([T|Q],B,[T2|Res]):-    possible_move_per_piece(T,B,T2),
-                                            get_all_moves_helper(Q,B,Res).
+get_all_moves_helper([T|Q],B,[T2|Res]):-
+    possible_move_per_piece(T,B,T2),
+    get_all_moves_helper(Q,B,Res).
 
-get_all_moves(B,Res):-  get_allies(B,ListAllies),
-                        get_all_moves_helper(ListAllies,B,Res).
+get_all_moves(B,Res):-
+    get_allies(B,ListAllies),
+    get_all_moves_helper(ListAllies,B,Res).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -335,6 +341,14 @@ usefulTest(Res):-   board(B),
                     get_all_moves(B,Res).
 
 %%%%%% MOVE DE TEST %%%%%%
-get_moves([[[1,0],[2,0]],[[1,0],[2,2]],[[0,1],[0,0]],[[0,0],[0,1]]], _, _).
+move_example([[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
+
+get_moves(Move, Gamestate, Board):-
+    board(Board),
+    get_all_moves(Board,PossibleMoves),
+    % print(PossibleMoves).
+    move_example(Move).
+    % choose_move(Board,PossibleMoves,Move).
+
 % get_moves([[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]], Gamestate, Board).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
