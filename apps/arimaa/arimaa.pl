@@ -36,12 +36,13 @@ add_move(NewMove) :-
 
 %%%%%% INITIALISATION %%%%%%
 %The little one
+board([[0,0,rabbit,silver]]).
 % board([[0,0,rabbit,silver],[1,1,horse,silver]]).
-%board([[0,0,rabbit,silver],[1,2,horse,silver],[0,2,horse,silver]]).
+% board([[0,0,rabbit,silver],[1,2,horse,silver],[0,2,horse,silver]]).
 
 
 %The original one
-board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+%board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %The custom one
 %board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
@@ -359,7 +360,7 @@ adjacent_hole([X,Y,_,_], C):-get_west([X,Y], C),
 get_allies_near_hole([],[]).
 
 get_allies_near_hole([[X,Y,A,silver]|B],[[X,Y,A,silver]|Res]):-
-    piece_near_hole([X,Y,A,T]),
+    piece_near_hole([X,Y,A,_]),
     get_allies_near_hole(B,Res).
 
 get_allies_near_hole([_|B], Res):-
@@ -370,7 +371,7 @@ get_allies_near_hole([_|B], Res):-
 get_ennemies_near_hole([],[]).
 
 get_ennemies_near_hole([[X,Y,A,gold]|B],[[X,Y,A,gold]|Res]):-
-    piece_near_hole([X,Y,A,T]),
+    piece_near_hole([X,Y,A,_]),
     get_ennemies_near_hole(B,Res).
 
 get_ennemies_near_hole([_|B], Res):-
@@ -379,11 +380,11 @@ get_ennemies_near_hole([_|B], Res):-
 
 %%%%%%%%%%%%%%% Return TRUE si la pièce est en danger.
 allie_in_danger([X,Y,A,silver], B):-
-    adjacent_hole([X,Y,A,T],Ch),
+    adjacent_hole([X,Y,A,_],Ch),
     \+ at_least_one_ally(Ch,B).
 
 ennemies_in_danger([X,Y,A,gold], B):-
-    adjacent_hole([X,Y,A,T],Ch),
+    adjacent_hole([X,Y,A,_],Ch),
     \+ at_least_one_ally_gold(Ch,B).
 
 
@@ -449,7 +450,7 @@ add_move_piece(PieceCoord,[Choice|ChoicesLeft],N):-
     add_move_piece(PieceCoord,ChoicesLeft,N2).
 
 
-choose_move(_,[[[X,Y,_,_]|LastChoice]|_],4):-
+choose_move(_,[[[X,Y,_,_]|[LastChoice|_]]|_],4):-
     add_move([[X,Y],LastChoice]).
 choose_move(Board,[[[X,Y,_,_]|PossibleChoices]|PossibleMoves],StepLeft):-
     add_move_piece([X,Y],PossibleChoices,StepLeft),
@@ -460,7 +461,7 @@ choose_move(_,_,_).
 get_moves(Move, _, Board):-
     get_all_moves(Board,PossibleMoves),
     asserta(moves([])),
-    choose_move(Board,PossibleMoves,0),
+    add_move_piece(Board,PossibleMoves,0),
     % add_move([[1,0],[2,0]]),
     % add_move([[0,0],[1,0]]),
     % add_move([[0,1],[0,0]]),
