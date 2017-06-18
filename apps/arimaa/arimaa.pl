@@ -341,14 +341,11 @@ usefulTest(Res):-   board(B),
                     get_all_moves(B,Res).
 
 %%%%%% MOVE DE TEST %%%%%%
-move_example([[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
+choose_move(Board,PossibleMoves,[[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
 
 get_moves(Move, Gamestate, Board):-
-    board(Board),
     get_all_moves(Board,PossibleMoves),
-    % print(PossibleMoves).
-    move_example(Move).
-    % choose_move(Board,PossibleMoves,Move).
+    choose_move(Board,PossibleMoves,Move).
 
 % get_moves([[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]], Gamestate, Board).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
