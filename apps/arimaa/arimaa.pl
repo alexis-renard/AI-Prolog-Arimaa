@@ -37,11 +37,11 @@ add_move(NewMove) :-
 %%%%%% INITIALISATION %%%%%%
 %The little one
 % board([[0,0,rabbit,silver],[1,1,horse,silver]]).
-board([[0,0,rabbit,silver],[1,1,horse,silver],[0,2,horse,silver],[2,3,horse,silver]]).
+%board([[0,0,rabbit,silver],[1,2,horse,silver],[0,2,horse,silver]]).
 
 
 %The original one
- %board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %The custom one
 %board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
@@ -299,6 +299,9 @@ stucked_by_west([X,Y,A,_],B):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),
 %%%%%% Test pour savoir si un allié nous permet de bouger %%%%%%%%%%%%%%
 at_least_one_ally([X,Y],B):-    get_adjacent_case([X,Y],B,Res),
                                 member([_,_,_,silver],Res).
+
+at_least_one_ally_gold([X,Y],B):-    get_adjacent_case([X,Y],B,Res),
+                                member([_,_,_,gold],Res).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -328,6 +331,85 @@ possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+%%%%%%%% Push %%%%%%%%%%
+
+%%Renvoie TRUE si la piece est au bord d'un trou.
+piece_near_hole([X,Y,_,_]):- get_north([X,Y], Cn),
+                             hole(Cn).
+piece_near_hole([X,Y,_,_]):- get_east([X,Y], Ce),
+                             hole(Ce).
+piece_near_hole([X,Y,_,_]):- get_south([X,Y], Cs),
+                             hole(Cs).
+piece_near_hole([X,Y,_,_]):- get_west([X,Y], Cw),
+                             hole(Cw).
+
+%%Renvoie la position du trou adjacent à notre pièce ou False
+adjacent_hole([X,Y,_,_], C):-get_north([X,Y], C),
+                             hole(C).
+adjacent_hole([X,Y,_,_], C):-get_east([X,Y], C),
+                             hole(C).
+adjacent_hole([X,Y,_,_], C):-get_south([X,Y], C),
+                             hole(C).
+adjacent_hole([X,Y,_,_], C):-get_west([X,Y], C),
+                             hole(C).
+
+
+%%Renvoie tous les alliés à côté d'un trou
+get_allies_near_hole([],[]).
+
+get_allies_near_hole([[X,Y,A,silver]|B],[[X,Y,A,silver]|Res]):-
+    piece_near_hole([X,Y,A,T]),
+    get_allies_near_hole(B,Res).
+
+get_allies_near_hole([_|B], Res):-
+    get_allies_near_hole(B,Res).
+
+
+%%Renvoie tous les ennemies à côté d'un trou
+get_ennemies_near_hole([],[]).
+
+get_ennemies_near_hole([[X,Y,A,gold]|B],[[X,Y,A,gold]|Res]):-
+    piece_near_hole([X,Y,A,T]),
+    get_ennemies_near_hole(B,Res).
+
+get_ennemies_near_hole([_|B], Res):-
+    get_ennemies_near_hole(B,Res).
+
+
+%%%%%%%%%%%%%%% Return TRUE si la pièce est en danger.
+allie_in_danger([X,Y,A,silver], B):-
+    adjacent_hole([X,Y,A,T],Ch),
+    \+ at_least_one_ally(Ch,B).
+
+ennemies_in_danger([X,Y,A,gold], B):-
+    adjacent_hole([X,Y,A,T],Ch),
+    \+ at_least_one_ally_gold(Ch,B).
+
+
+
+
+%%%%%%%%%%%%%%%%%Renvoie les alliés en danger de se faire push/pull dans un trou
+get_allies_in_danger([],[]).
+
+get_allies_in_danger([[X,Y,A,silver]|B],[[X,Y,A,silver]|Res]):-
+    allie_in_danger([X,Y,A,silver], B),
+    get_allies_in_danger(B,Res).
+
+get_allies_in_danger([_|B], Res):-
+    get_allies_in_danger(B,Res).
+
+%%%%%%%%%%%%%%%Renvoie les ennemies en danger de se faire push/pull dans un trou
+get_ennemies_in_danger([],[]).
+
+get_ennemies_in_danger([[X,Y,A,gold]|B],[[X,Y,A,gold]|Res]):-
+    ennemies_in_danger([X,Y,A,gold], B),
+    get_ennemies_in_danger(B,Res).
+
+get_ennemies_in_danger([_|B], Res):-
+    get_ennemies_in_danger(B,Res).
+
+
 %%%%%% TOUS LES MOUVEMENTS POSSIBLES PAR L'IA %%%%%%%%%%%%%%
 
 get_all_moves_helper([],_,[]).
@@ -353,6 +435,7 @@ usefulTest(Move):-  board(B),
                     % add_move([[0,0],[0,1]]),
                     % choose_move(B,PossibleMoves,4),
                     moves(Move).
+
 
 %%%%%% MOVE DE TEST %%%%%%
 % choose_move(Board,PossibleMoves,[[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
