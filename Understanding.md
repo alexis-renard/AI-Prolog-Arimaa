@@ -73,3 +73,7 @@ Qui provoquent une erreur :
 * Récupérer tous les voisins d'une case
 * Récupérer les pièces ennemies ou alliées  
 * Récupérer les infos d'une case en fonction de ses coordonnées
+
+
+
+
