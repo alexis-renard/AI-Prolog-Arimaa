@@ -466,14 +466,12 @@ choose_move([[[X,Y,_,_]|PossibleChoices]|PossibleMoves]):-
     choose_move(PossibleMoves).
 choose_move(_).
 
-% get_moves([[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[1,3]],[[0,0],[1,0]],[[0,0],[0,1]]], _, Board):-
-get_moves(Move, _, Board):-
+% get_moves([[[1,2],[2,2]],[[2,2],[3,2]],[[3,2],[3,3]],[[2,4],[3,4]]], Dashboard, Board).
+get_moves(Move, Dashboard, Board):-
     % retractall(moves()),
     % retractall(cpt()),
     get_all_moves(Board,PossibleMoves),
-    retractall(moves()),
     asserta(moves([])),
-    retractall(cpt()),
     asserta(cpt(0)),
     choose_move(PossibleMoves),
     % add_move([[1,0],[2,0]]),
@@ -481,9 +479,11 @@ get_moves(Move, _, Board):-
     % add_move([[0,1],[0,0]]),
     % add_move([[0,0],[0,1]]),
     moves(Move),
-    retract(moves(Move)),
-    cpt(Cpt),
-    retract(cpt(Cpt)).
+    % retract(moves(Move)),
+    retractall(moves(_)),
+    % cpt(Cpt),
+    % retract(cpt(Cpt)),
+    retractall(cpt(_)).
 
 
 
