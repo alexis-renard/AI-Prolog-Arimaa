@@ -6,9 +6,13 @@
 %%set_prolog_flag(answer_write_options,[max_depth(0)]).
 
 % declare the dynamic fact
+:- dynamic board/1.
 :- dynamic moves/1.
 :- dynamic cpt/1.
+
+
 % max_session_pengines(-1).
+
 
 %
 %
@@ -48,21 +52,28 @@
 
 %%%%%% INITIALISATION %%%%%%
 %The little one
-% board([[0,0,rabbit,silver]]).
-% board([[0,0,rabbit,silver],[1,1,horse,silver]]).
-%board([[0,0,rabbit,silver],[1,2,horse,silver],[3,2,horse,silver]]).
+% staticBoard([[0,0,rabbit,silver]]).
+% staticBoard([[0,0,rabbit,silver],[1,1,horse,silver]]).
+%staticBoard([[0,0,rabbit,silver],[1,2,horse,silver],[3,2,horse,silver]]).
 
 
 %The original one
-board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+staticBoard([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %The custom one
-%board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+%staticBoard([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%% EMPTY  %%%%%%
 emptyList([]).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%% Delete one element of a list  %%%%%%
+removeElementList(_, [], []).
+removeElementList(X,[X|Q],Q).
+removeElementList(X,[T|Q],[T|Res]):-removeElementList(X,Q,Res).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -341,11 +352,11 @@ stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],[X,Y],B),
 %%%%%% MOUVEMENT D'UNE PIECE SUR UN STEP %%%%%%%%%%%%%%
 possible_move_per_piece([X,Y,A,T],B,[]):-   stucked([X,Y,A,T],B).        %Done
 
-possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-
-    possible_move_per_piece_north([X,Y,A,T],B,Cn),
-    possible_move_per_piece_east([X,Y,A,T],B,Ce),
+possible_move_per_piece([X,Y,A,T],B,[Cs,Ce,Cw,Cn]):-
     possible_move_per_piece_south([X,Y,A,T],B,Cs),
-    possible_move_per_piece_west([X,Y,A,T],B,Cw).
+    possible_move_per_piece_east([X,Y,A,T],B,Ce),
+    possible_move_per_piece_west([X,Y,A,T],B,Cw),
+    possible_move_per_piece_north([X,Y,A,T],B,Cn).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -454,21 +465,26 @@ increment_cpt():-
     StepLeft2 is StepLeft+1,
     asserta(cpt(StepLeft2)).
 
+update_board([[X,Y,A,T],[NewX,NewY]]) :-
+    board(B),
+    removeElementList([X,Y,A,T],B, Board),
+    retract(board(B)),
+    asserta(board([[NewX,NewY,A,T]|Board])).
+
 add_move_piece(_,[]).
-add_move_piece(PieceCoord,[Choice|ChoicesLeft]):-
-    add_move([PieceCoord,Choice]),
+add_move_piece([X,Y,A,T],[Choice|_]):-
+    add_move([[X,Y],Choice]),
+    update_board([[X,Y,A,T],Choice]).
+
+
+choose_move([[[X,Y,A,T]|PossibleChoices]|_]):-
+    add_move_piece([X,Y,A,T],PossibleChoices),
+    board(TmpBoard),
+    get_all_moves(TmpBoard,PossibleMovesUpdated),
     increment_cpt(),
     cpt(StepLeft),
-    StepLeft<4,
-    add_move_piece(PieceCoord,ChoicesLeft).
-
-
-
-choose_move([[[X,Y,_,_]|PossibleChoices]|PossibleMoves]):-
-    add_move_piece([X,Y],PossibleChoices),
-    cpt(StepLeft),
     StepLeft < 4,
-    choose_move(PossibleMoves).
+    choose_move(PossibleMovesUpdated).
 choose_move(_).
 
 % get_moves([[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[1,3]],[[0,0],[1,0]],[[0,0],[0,1]]], _, Board):-
@@ -476,27 +492,32 @@ get_moves(Move, _, Board):-
     % retractall(moves()),
     % retractall(cpt()),
     get_all_moves(Board,PossibleMoves),
-    retractall(moves()),
     asserta(moves([])),
     retractall(cpt()),
     asserta(cpt(0)),
+    asserta(board(Board)),
     choose_move(PossibleMoves),
     % add_move([[1,0],[2,0]]),
     % add_move([[0,0],[1,0]]),
     % add_move([[0,1],[0,0]]),
     % add_move([[0,0],[0,1]]),
     moves(Move),
-    retract(moves(Move)),
-    cpt(Cpt),
-    retract(cpt(Cpt)).
+    retractall(moves(_)),
+    retractall(board(_)).
+    % cpt(Cpt),
+    % retract(cpt(Cpt)).
 
-
+% add_board([X,Y,A,T], [Xnew, Ynew, A, T]):-
+%     board(B),
+%     retract(Board(B)),
+%     asserta(Board([[Xnew, Ynew, A, T]|B]))
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usefulTest(Res):-  board(B),
-                    get_all_moves(B, Res).
+% usefulTest(Res):-   board(B),
+
+                    %get_all_moves(B, Res).
                     %asserta(moves([])),
                     %asserta(cpt(0)),
                     %choose_move(PossibleMoves),
