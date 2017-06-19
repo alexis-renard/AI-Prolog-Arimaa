@@ -476,7 +476,9 @@ get_moves(Move, _, Board):-
     % retractall(moves()),
     % retractall(cpt()),
     get_all_moves(Board,PossibleMoves),
+    retractall(moves()),
     asserta(moves([])),
+    retractall(cpt()),
     asserta(cpt(0)),
     choose_move(PossibleMoves),
     % add_move([[1,0],[2,0]]),
@@ -484,25 +486,31 @@ get_moves(Move, _, Board):-
     % add_move([[0,1],[0,0]]),
     % add_move([[0,0],[0,1]]),
     moves(Move),
-    retractall(moves(_)),
-    retractall(cpt(_)).
+    retract(moves(Move)),
+    cpt(Cpt),
+    retract(cpt(Cpt)).
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usefulTest(Res):-   board(B),
-                    get_all_moves(B, PossibleMoves),
-                    asserta(moves([])),
-                    asserta(cpt(0)),
-                    choose_move(PossibleMoves),
+usefulTest(Res):-  board(B),
+                    get_all_moves(B, Res).
+                    %asserta(moves([])),
+                    %asserta(cpt(0)),
+                    %choose_move(PossibleMoves),
                     % add_move([[1,0],[2,0]]),
                     % add_move([[0,0],[1,0]]),
                     % add_move([[0,1],[0,0]]),
                     % add_move([[0,0],[0,1]]),
                     % choose_move(B,PossibleMoves,4),
-                    moves(Res),
-                    retractall(moves(_)),
-                    retractall(cpt(_)).
+                    %moves(Move),
+                    %retract(moves(Move)),
+                    %cpt(Cpt),
+                    %retract(cpt(Cpt)).
+                    % print("Move2"),
+                    % print(Move).
 
 % get_moves(Move, Gamestate, Board):-
 %     get_all_moves(Board,PossibleMoves),

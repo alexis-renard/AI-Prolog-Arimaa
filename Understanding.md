@@ -92,7 +92,3 @@ Points des moves pour Min/Max :
 
 
 
-
-
-
->>>>>>> 454c6d71a3bbe968c3b075960efc717aa0212303
