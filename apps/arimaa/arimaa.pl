@@ -54,11 +54,11 @@ increment_cpt(Value):-
 %The little one
 % board([[0,0,rabbit,silver]]).
 % board([[0,0,rabbit,silver],[1,1,horse,silver]]).
-board([[0,0,rabbit,silver],[1,2,horse,silver],[0,2,horse,silver]]).
+%board([[0,0,rabbit,silver],[1,2,horse,silver],[3,2,horse,silver]]).
 
 
 %The original one
-%board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %The custom one
 %board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
@@ -247,7 +247,7 @@ vide([X,Y,_,_]):-   board(B),
 possible_move_per_piece_north([X,Y,_,_],_,[]):- border_north([X,Y]).   %%Cas bordures
 possible_move_per_piece_north([X,Y,_,_],B,[]):- get_north([X,Y],Cn),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
                                                 hole(Cn),
-                                                \+ at_least_one_ally(Cn,B).
+                                                \+ at_least_one_ally(Cn,[X,Y],B).
 possible_move_per_piece_north([X,Y,_,_],B,[]):- get_infos_north([X,Y],B,[_,_,_,Tn]),  %%Cas piece alliée au nord
                                                 silver = Tn.
 possible_move_per_piece_north([X,Y,A,_],B,[]):- get_infos_north([X,Y],B,[_,_,An,Tn]), % Cas où on a une case vide, ou un ennemi
@@ -260,7 +260,7 @@ possible_move_per_piece_north([X,Y,_,_],_,Cn):- get_north([X,Y],Cn).
 possible_move_per_piece_east([X,Y,_,_],_,[]):- border_east([X,Y]).   %%Cas bordures
 possible_move_per_piece_east([X,Y,_,_],B,[]):- get_east([X,Y],Ce),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
                                                 hole(Ce),
-                                                \+ at_least_one_ally(Ce,B).
+                                                \+ at_least_one_ally(Ce,[X,Y],B).
 possible_move_per_piece_east([X,Y,_,_],B,[]):- get_infos_east([X,Y],B,[_,_,_,Te]),  %%Cas piece alliée au nord
                                                 silver = Te.
 possible_move_per_piece_east([X,Y,A,_],B,[]):- get_infos_east([X,Y],B,[_,_,Ae,Te]),% Cas où on a une case vide, ou un ennemi
@@ -273,12 +273,12 @@ possible_move_per_piece_east([X,Y,_,_],_,Ce):- get_east([X,Y],Ce).
 possible_move_per_piece_south([X,Y,_,_],_,[]):- border_south([X,Y]).   %%Cas bordures
 possible_move_per_piece_south([X,Y,_,_],B,[]):- get_south([X,Y],Cs),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
                                                 hole(Cs),
-                                                \+ at_least_one_ally(Cs,B).
+                                                \+ at_least_one_ally(Cs,[X,Y],B).
 possible_move_per_piece_south([X,Y,_,_],B,[]):- get_infos_south([X,Y],B,[_,_,_,Ts]),  %%Cas piece alliée au nord
                                                 silver = Ts.
 possible_move_per_piece_south([X,Y,A,_],B,[]):- get_infos_south([X,Y],B,[_,_,As,Ts]),% Cas où on a une case vide, ou un ennemi
                                                 gold = Ts,
-                                                \+is_stronger(A,As).
+                                                is_stronger(As,A).
 
 possible_move_per_piece_south([X,Y,_,_],_,Cs):- get_south([X,Y],Cs).
 
@@ -286,7 +286,7 @@ possible_move_per_piece_south([X,Y,_,_],_,Cs):- get_south([X,Y],Cs).
 possible_move_per_piece_west([X,Y,_,_],_,[]):- border_west([X,Y]).   %%Cas bordures
 possible_move_per_piece_west([X,Y,_,_],B,[]):- get_west([X,Y],Cw),       %%Cas trou sans alliée (renvoie True si la case au nord est un trou et qu'il n'y a pas d'alliée autour)
                                                 hole(Cw),
-                                                \+ at_least_one_ally(Cw,B).
+                                                \+ at_least_one_ally(Cw,[X,Y],B).
 possible_move_per_piece_west([X,Y,_,_],B,[]):- get_infos_west([X,Y],B,[_,_,_,Tw]),  %%Cas piece alliée au nord
                                                 silver = Tw.
 possible_move_per_piece_west([X,Y,A,_],B,[]):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),% Cas où on a une case vide, ou un ennemi
@@ -314,24 +314,29 @@ stucked_by_west([X,Y,A,_],B):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%% Test pour savoir si un allié nous permet de bouger %%%%%%%%%%%%%%
-at_least_one_ally([X,Y],B):-    get_adjacent_case([X,Y],B,Res),
-                                member([_,_,_,silver],Res).
 
-at_least_one_ally_gold([X,Y],B):-    get_adjacent_case([X,Y],B,Res),
-                                member([_,_,_,gold],Res).
+same([X,Y], [Xp,Yp]):-X = Xp, Y=Yp.
+
+at_least_one_ally([X,Y],[Xprev,Yprev],B):-    get_adjacent_case([X,Y],B,Res),
+                                member([X1,Y1,_,silver],Res),
+                                \+ same([X1,Y1],[Xprev,Yprev]).
+
+at_least_one_ally_gold([X,Y],[Xprev,Yprev],B):-    get_adjacent_case([X,Y],B,Res),
+                                member([X1,Y1,_,gold],Res),
+                                \+ same([X1,Y1],[Xprev,Yprev]).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%% STUCKED  %%%%%%%%%%%%%%
 % PIECE BLOQUEE PAR ENNEMI PLUS FORT
-stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
+stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],[X,Y],B),
                         stucked_by_north([X,Y,A,T],B).
-stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
+stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],[X,Y],B),
                         stucked_by_east([X,Y,A,T],B).
 
-stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
+stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],[X,Y],B),
                         stucked_by_south([X,Y,A,T],B).
-stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],B),
+stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],[X,Y],B),
                        stucked_by_west([X,Y,A,T],B).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -397,11 +402,11 @@ get_ennemies_near_hole([_|B], Res):-
 %%%%%%%%%%%%%%% Return TRUE si la pièce est en danger.
 allie_in_danger([X,Y,A,silver], B):-
     adjacent_hole([X,Y,A,_],Ch),
-    \+ at_least_one_ally(Ch,B).
+    \+ at_least_one_ally(Ch,[X,Y],B).
 
 ennemies_in_danger([X,Y,A,gold], B):-
     adjacent_hole([X,Y,A,_],Ch),
-    \+ at_least_one_ally_gold(Ch,B).
+    \+ at_least_one_ally_gold(Ch,[X,Y],B).
 
 
 
@@ -491,20 +496,20 @@ get_moves(Move, _, Board):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usefulTest(Move):-  board(B),
-                    get_all_moves(B,PossibleMoves),
-                    asserta(moves([])),
-                    asserta(cpt(0)),
-                    choose_move(PossibleMoves),
+usefulTest(Res):-  board(B),
+                    get_all_moves(B, Res).
+                    %asserta(moves([])),
+                    %asserta(cpt(0)),
+                    %choose_move(PossibleMoves),
                     % add_move([[1,0],[2,0]]),
                     % add_move([[0,0],[1,0]]),
                     % add_move([[0,1],[0,0]]),
                     % add_move([[0,0],[0,1]]),
                     % choose_move(B,PossibleMoves,4),
-                    moves(Move),
-                    retract(moves(Move)),
-                    cpt(Cpt),
-                    retract(cpt(Cpt)).
+                    %moves(Move),
+                    %retract(moves(Move)),
+                    %cpt(Cpt),
+                    %retract(cpt(Cpt)).
                     % print("Move2"),
                     % print(Move).
 
