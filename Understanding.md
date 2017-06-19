@@ -38,7 +38,9 @@ Qui provoquent une erreur :
         * Est-elle bougeable ?  **DONE**
     * La case est donc libre, il peut bouger (si il a assez de step)  **DONE**
 
-* Lister tous les mouvements possibles  **DONE**
+* Lister tous les mouvements possibles
+    * Ajouter les push et pull *TODO*
+
 
 * Bons coups à jouer
     * Si on peut gagner (mener un lapin à une position gagnante)
