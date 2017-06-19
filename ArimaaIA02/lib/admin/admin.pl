@@ -14,7 +14,6 @@
 
 %%	show_settings(+Request) is det
 %
-% max_session_pengines(-1).
 
 show_settings(Request) :-
     http_parameters(Request,
@@ -98,3 +97,10 @@ set_settings(Request) :-
     ;   message_to_string(Error, Msg),
         reply_json(json{error:true, msg:Msg, name:Name})
     ).
+
+
+
+
+
+
+
