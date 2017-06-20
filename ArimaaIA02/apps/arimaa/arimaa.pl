@@ -359,12 +359,23 @@ possible_move_per_piece([X,Y,A,T],B,[]):-   stucked([X,Y,A,T],B).        %Done
 %     possible_move_per_piece_east([X,Y,A,T],B,Ce),
 %     possible_move_per_piece_west([X,Y,A,T],B,Cw),
 %     possible_move_per_piece_north([X,Y,A,T],B,Cn).
+possible_move_per_piece([X,Y,rabbit,T],B,[Cs,Ce,Cw,Cn]):-
+    possible_move_per_piece_north([X,Y,rabbit,T],B,Cn),
+    possible_move_per_piece_east([X,Y,rabbit,T],B,Ce),
+    possible_move_per_piece_south([X,Y,rabbit,T],B,Cs),
+    possible_move_per_piece_west([X,Y,rabbit,T],B,Cw).
 
-possible_move_per_piece([X,Y,A,T],B,[Cs,Ce,Cw,Cn]):-
+possible_move_per_piece([X,Y,elephant,T],B,[Cs,Ce,Cw,Cn]):-
+    possible_move_per_piece_north([X,Y,elephant,T],B,Cn),
+    possible_move_per_piece_east([X,Y,elephant,T],B,Ce),
+    possible_move_per_piece_south([X,Y,elephant,T],B,Cs),
+    possible_move_per_piece_west([X,Y,elephant,T],B,Cw).
+
+possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-
     possible_move_per_piece_north([X,Y,A,T],B,Cn),
     possible_move_per_piece_east([X,Y,A,T],B,Ce),
-    possible_move_per_piece_west([X,Y,A,T],B,Cw),
-    possible_move_per_piece_south([X,Y,A,T],B,Cs).
+    possible_move_per_piece_south([X,Y,A,T],B,Cs),
+    possible_move_per_piece_west([X,Y,A,T],B,Cw).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -477,7 +488,6 @@ no_to_cannibalism(ChoiceDestination,[[[X,Y,A,T]|MovesPiece]|PossibleMoves],Possi
     append(PossibleMoves,[NewPossibleMovePiece],PossibleMovesUpdated).
 
 %%%%%% MOVE DE TEST %%%%%%
-% choose_move(Board,PossibleMoves,[[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
 %predicat to add a new move to the list of moves
 add_move(NewMove) :-
     moves(M),
@@ -509,10 +519,9 @@ choose_move([[[X,Y,A,T]|PossibleChoices]|PossibleMoves]):-
     choose_move(PossibleMovesUpdated).
 choose_move(_).
 
-
-% get_moves([[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[1,3]],[[0,0],[1,0]],[[0,0],[0,1]]], _, Board):-
 get_moves(Move, _, Board):-
     get_all_moves(Board,PossibleMoves),
+    % findall()
     asserta(moves([])),
     asserta(cpt(0)),
     asserta(board(Board)),
