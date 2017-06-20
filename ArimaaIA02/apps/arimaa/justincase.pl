@@ -6,9 +6,9 @@
 %%set_prolog_flag(answer_write_options,[max_depth(0)]).
 
 % declare the dynamic fact
-:- dynamic board/1.
 :- dynamic moves/1.
 :- dynamic cpt/1.
+:- dynamic board/1.
 
 
 % max_session_pengines(-1).
@@ -52,16 +52,16 @@
 
 %%%%%% INITIALISATION %%%%%%
 %The little one
-% staticBoard([[0,0,rabbit,silver]]).
-% staticBoard([[0,0,rabbit,silver],[1,1,horse,silver]]).
-% staticBoard([[0,2,horse,silver],[3,2,horse,silver],[1,2,horse,silver],[0,3,horse,silver],[0,0,rabbit,silver],[1,0,horse,silver]]).
+% board([[0,0,rabbit,silver]]).
+% board([[0,0,rabbit,silver],[1,1,horse,silver]]).
+%board([[0,0,rabbit,silver],[1,2,horse,silver],[3,2,horse,silver]]).
 
 
 %The original one
-staticBoard([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,rabbit,gold],[7,1,rabbit,gold],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %The custom one
-%staticBoard([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
+%board([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rabbit,silver],[0,4,elephant,silver],[0,5,rabbit,silver],[0,6,rabbit,silver],[0,7,rabbit,silver],[1,0,camel,silver],[1,1,cat,silver],[1,2,rabbit,silver],[1,3,dog,silver],[1,4,rabbit,silver],[1,5,horse,silver],[1,6,dog,silver],[1,7,cat,silver],[6,1,horse,gold],[6,2,camel,gold],[6,3,elephant,gold],[6,4,rabbit,gold],[6,5,dog,gold],[6,6,rabbit,gold],[7,0,horse,gold],[7,1,rabbit,silver],[7,2,rabbit,gold],[7,3,cat,gold],[7,4,dog,gold],[7,5,rabbit,gold],[7,6,horse,gold],[7,7,rabbit,gold]]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -69,14 +69,6 @@ staticBoard([[0,0,rabbit,silver],[0,1,rabbit,silver],[0,2,horse,silver],[0,3,rab
 emptyList([]).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% l'inverse d'une liste vide est une liste vide
-invList([],[]).
-
-% pour inverser une liste, je mets le premier élémement de la liste
-% à la fin du reste de la liste inversé
-invList([X|Xs],Acc) :-
-    invList(Xs,Acc1),
-    append(Acc1, [X], Acc).
 
 %%%%%% Delete one element of a list  %%%%%%
 removeElementList(_, [], []).
@@ -265,9 +257,9 @@ possible_move_per_piece_north([X,Y,_,_],B,[]):- get_north([X,Y],Cn),       %%Cas
                                                 \+ at_least_one_ally(Cn,[X,Y],B).
 possible_move_per_piece_north([X,Y,_,_],B,[]):- get_infos_north([X,Y],B,[_,_,_,Tn]),  %%Cas piece alliée au nord
                                                 silver = Tn.
-possible_move_per_piece_north([X,Y,_,_],B,[]):- get_infos_north([X,Y],B,[_,_,_,Tn]), % Cas où on a une case vide, ou un ennemi
-                                                gold = Tn.
-                                                % \+is_stronger(A,An). %%probleme de cannibalisme, obligé de disparaitre...
+possible_move_per_piece_north([X,Y,A,_],B,[]):- get_infos_north([X,Y],B,[_,_,An,Tn]), % Cas où on a une case vide, ou un ennemi
+                                                gold = Tn,
+                                                \+is_stronger(A,An).
 
 possible_move_per_piece_north([X,Y,_,_],_,Cn):- get_north([X,Y],Cn).
 
@@ -278,9 +270,9 @@ possible_move_per_piece_east([X,Y,_,_],B,[]):- get_east([X,Y],Ce),       %%Cas t
                                                 \+ at_least_one_ally(Ce,[X,Y],B).
 possible_move_per_piece_east([X,Y,_,_],B,[]):- get_infos_east([X,Y],B,[_,_,_,Te]),  %%Cas piece alliée au nord
                                                 silver = Te.
-possible_move_per_piece_east([X,Y,_,_],B,[]):- get_infos_east([X,Y],B,[_,_,_,Te]),% Cas où on a une case vide, ou un ennemi
-                                                gold = Te.
-                                                % \+is_stronger(A,Ae). %%probleme de cannibalisme, obligé de disparaitre...
+possible_move_per_piece_east([X,Y,A,_],B,[]):- get_infos_east([X,Y],B,[_,_,Ae,Te]),% Cas où on a une case vide, ou un ennemi
+                                                gold = Te,
+                                                \+is_stronger(A,Ae).
 
 possible_move_per_piece_east([X,Y,_,_],_,Ce):- get_east([X,Y],Ce).
 
@@ -291,9 +283,9 @@ possible_move_per_piece_south([X,Y,_,_],B,[]):- get_south([X,Y],Cs),       %%Cas
                                                 \+ at_least_one_ally(Cs,[X,Y],B).
 possible_move_per_piece_south([X,Y,_,_],B,[]):- get_infos_south([X,Y],B,[_,_,_,Ts]),  %%Cas piece alliée au nord
                                                 silver = Ts.
-possible_move_per_piece_south([X,Y,_,_],B,[]):- get_infos_south([X,Y],B,[_,_,_,Ts]),% Cas où on a une case vide, ou un ennemi
-                                                gold = Ts.
-                                                % is_stronger(As,A). %%probleme de cannibalisme, obligé de disparaitre...
+possible_move_per_piece_south([X,Y,A,_],B,[]):- get_infos_south([X,Y],B,[_,_,As,Ts]),% Cas où on a une case vide, ou un ennemi
+                                                gold = Ts,
+                                                is_stronger(As,A).
 
 possible_move_per_piece_south([X,Y,_,_],_,Cs):- get_south([X,Y],Cs).
 
@@ -304,9 +296,9 @@ possible_move_per_piece_west([X,Y,_,_],B,[]):- get_west([X,Y],Cw),       %%Cas t
                                                 \+ at_least_one_ally(Cw,[X,Y],B).
 possible_move_per_piece_west([X,Y,_,_],B,[]):- get_infos_west([X,Y],B,[_,_,_,Tw]),  %%Cas piece alliée au nord
                                                 silver = Tw.
-possible_move_per_piece_west([X,Y,_,_],B,[]):- get_infos_west([X,Y],B,[_,_,_,Tw]),% Cas où on a une case vide, ou un ennemi
-                                                gold = Tw.
-                                                % \+is_stronger(A,Aw). %%probleme de cannibalisme, obligé de disparaitre...
+possible_move_per_piece_west([X,Y,A,_],B,[]):- get_infos_west([X,Y],B,[_,_,Aw,Tw]),% Cas où on a une case vide, ou un ennemi
+                                                gold = Tw,
+                                                \+is_stronger(A,Aw).
 
 possible_move_per_piece_west([X,Y,_,_],_,Cw):- get_west([X,Y],Cw).
 
@@ -360,23 +352,11 @@ stucked([X,Y,A,T],B):-  \+at_least_one_ally([X,Y],[X,Y],B),
 %%%%%% MOUVEMENT D'UNE PIECE SUR UN STEP %%%%%%%%%%%%%%
 possible_move_per_piece([X,Y,A,T],B,[]):-   stucked([X,Y,A,T],B).        %Done
 
-% possible_move_per_piece([X,Y,rabbit,T],B,[Cs,Ce,Cw,Cn]):-
-%     possible_move_per_piece_south([X,Y,A,T],B,Cs),
-%     possible_move_per_piece_east([X,Y,A,T],B,Ce),
-%     possible_move_per_piece_west([X,Y,A,T],B,Cw),
-%     possible_move_per_piece_north([X,Y,A,T],B,Cn).
-%
-% possible_move_per_piece([X,Y,elephant,T],B,[Cs,Ce,Cw,Cn]):-
-%     possible_move_per_piece_south([X,Y,A,T],B,Cs),
-%     possible_move_per_piece_east([X,Y,A,T],B,Ce),
-%     possible_move_per_piece_west([X,Y,A,T],B,Cw),
-%     possible_move_per_piece_north([X,Y,A,T],B,Cn).
-
-possible_move_per_piece([X,Y,A,T],B,[Cs,Ce,Cw,Cn]):-
-    possible_move_per_piece_south([X,Y,A,T],B,Cs),
+possible_move_per_piece([X,Y,A,T],B,[Cn,Ce,Cs,Cw]):-
+    possible_move_per_piece_north([X,Y,A,T],B,Cn),
     possible_move_per_piece_east([X,Y,A,T],B,Ce),
-    possible_move_per_piece_west([X,Y,A,T],B,Cw),
-    possible_move_per_piece_north([X,Y,A,T],B,Cn).
+    possible_move_per_piece_south([X,Y,A,T],B,Cs),
+    possible_move_per_piece_west([X,Y,A,T],B,Cw).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -471,88 +451,6 @@ get_all_moves(B,Res):-
     get_allies(B,ListAllies),
     get_all_moves_helper(ListAllies,B,Res).
 
-
-%%%%%% Va enlever des choix possibles la case sur laquelle un pion vient de se déplacer (on empeche le cannibalisme entre des pieces de la même équipe) %%%%%%%%%%%%%%
-
-% no_to_cannibalism_piece(_,[],[]).
-% no_to_cannibalism_piece([Xdest,Ydest],[[X,Y,_,_]|[Xdest,Ydest]|ChoicesLeft],ChoicesLeft).
-% no_to_cannibalism_piece([Xdest,Ydest],[[X,Y,_,_]|[Xdest2,Ydest2]|ChoicesLeft],[[X,Y,_,_]|PossibleMovesUpdated]):-
-%     no_to_cannibalism_piece([Xdest,Ydest],[[X,Y,_,_]|ChoicesLeft],PossibleMovesUpdated).
-
-no_to_cannibalism_piece(_,[],[]).
-no_to_cannibalism_piece([Xdest,Ydest],[[Xdest,Ydest]|ChoicesLeft],ChoicesLeft).
-no_to_cannibalism_piece([Xdest,Ydest],[[Xdest2,Ydest2]|ChoicesLeft],[[Xdest2,Ydest2]|PossibleMovesUpdated]):-
-    no_to_cannibalism_piece([Xdest,Ydest],ChoicesLeft,PossibleMovesUpdated).
-
-%%%%%% On va donc supprimer les destinations qui correspondent à notre ChoiceDestination pour chaque piece. Les moves sont de la forme : [1,2,horse,silver],[2,2],[1,3],[1,1],[0,2]]
-
-% no_to_cannibalism(_,[],[]).
-% no_to_cannibalism(ChoiceDestination,[[[X,Y,A,T]|MovesPiece]|PossibleMoves],[NewPossibleMovePiece|PossibleMovesUpdated]):-
-%     % print("MovesPieceUpdated : "),
-%     % print(MovesPieceUpdated),
-%     % nl,
-%     % print("NewPossibleMovePiece : "),
-%     % print(NewPossibleMovePiece),
-%     % nl,
-%     no_to_cannibalism_piece(ChoiceDestination,MovesPiece,MovesPieceUpdated),
-%     print("1MovesPiece : "),
-%     print(MovesPiece),
-%     nl,
-%     print("1MovesPieceUpdated : "),
-%     print(MovesPieceUpdated),
-%     nl,
-%     append([[X,Y,A,T]],MovesPieceUpdated,NewPossibleMovePiece),
-%     print("2NewPossibleMovePiece : "),
-%     print(NewPossibleMovePiece),
-%     nl,
-%     % append(PossibleMoves,[NewPossibleMovePiece],PossibleMovesUpdated2),
-%     % print("3PossibleMovesUpdated2 : "),
-%     % print(PossibleMovesUpdated2),
-%     % nl,
-%     no_to_cannibalism(ChoiceDestination,PossibleMoves,PossibleMovesUpdated).
-%     % print("0PossibleMoves : "),
-%     % print(PossibleMoves),
-%     % nl,
-%     % print("0PossibleMovesUpdated2 : "),
-%     % print(PossibleMovesUpdated2),
-%     % nl,
-% % no_to_cannibalism(_,_,_).
-
-%14h45
-no_to_cannibalism(_,[],[]).
-no_to_cannibalism(ChoiceDestination,[[[X,Y,A,T]|MovesPiece]|PossibleMoves],PossibleMovesUpdated):-
-    % print("MovesPieceUpdated : "),
-    % print(MovesPieceUpdated),
-    % nl,
-    % print("NewPossibleMovePiece : "),
-    % print(NewPossibleMovePiece),
-    % nl,
-    % print("PossibleMovesUpdated2 : "),
-    % print(PossibleMovesUpdated2),
-    % nl,
-    no_to_cannibalism(ChoiceDestination,PossibleMoves,PossibleMovesUpdated2),
-    % print("1MovesPiece : "),
-    % print(MovesPiece),
-    % nl,
-    no_to_cannibalism_piece(ChoiceDestination,MovesPiece,MovesPieceUpdated2),
-    % print("2MovesPieceUpdated2 : "),
-    % print(MovesPieceUpdated2),
-    % nl,
-    append([[X,Y,A,T]],MovesPieceUpdated2,NewPossibleMovePiece),
-    % print("3NewPossibleMovePiece : "),
-    % print(NewPossibleMovePiece),
-    % nl,
-    append(PossibleMoves,[NewPossibleMovePiece],PossibleMovesUpdated).
-    % print("4PossibleMovesUpdated : "),
-    % print(PossibleMovesUpdated),
-    % nl.
-
-
-% no_to_cannibalism(_,[],[]).
-% no_to_cannibalism([Xdest,Ydest],[[[X,Y],[Xdest,Ydest]]|ChoicesLeft],ChoicesLeft).
-% no_to_cannibalism([Xdest,Ydest],[[[X,Y],[Xdest2,Ydest2]]|ChoicesLeft],[[[X,Y],[Xdest2,Ydest2]]|PossibleMovesUpdated]):-
-%     no_to_cannibalism([Xdest,Ydest],ChoicesLeft,PossibleMovesUpdated).
-
 %%%%%% MOVE DE TEST %%%%%%
 % choose_move(Board,PossibleMoves,[[[1,0],[5,1]],[[0,0],[1,0]],[[0,1],[0,0]],[[0,0],[0,1]]]).
 %predicat to add a new move to the list of moves
@@ -567,93 +465,67 @@ increment_cpt():-
     StepLeft2 is StepLeft+1,
     asserta(cpt(StepLeft2)).
 
-update_board([X,Y,A,T],[NewX,NewY]):-
-    board(B),
-    removeElementList([X,Y,A,T],B,TmpBoard),
-    retract(board(B)),
-    asserta(board([[NewX,NewY,A,T]|TmpBoard])).
-
 add_move_piece(_,[],_).
-add_move_piece([X,Y,A,T],[FirstChoice|_],FirstChoice):-
-    % print("UN PEU DE SERIEUX SVP "),
-    % print(B),
-    add_move([[X,Y],FirstChoice]),
+add_move_piece([X,Y,A,T],[Choice|ChoicesLeft],Board):-
+    add_move([[X,Y],Choice]),
     increment_cpt(),
-    % print("UN PEU DE SERIEUX SVP2"),
-    update_board([X,Y,A,T],FirstChoice).
+    cpt(StepLeft),
+    StepLeft<4,
+    add_move_piece(Piece,ChoicesLeft,Board).
 
-choose_move([[[X,Y,A,T]|PossibleChoices]|PossibleMoves]):-
-    % print("T OUUUUUUUUUUU"),
-    % board(B),
-    % print(B),
-    % print("PossibleChoices"),
-    % print(PossibleChoices),
-    % nl,
-    add_move_piece([X,Y,A,T],PossibleChoices,ChoiceDestination),
-    % print("/   ChoiceDestination"),
-    % print(ChoiceDestination),
-    % nl,
-    % print("/   PossibleMoves"),
-    % print(PossibleMoves),
-    % nl,
-    no_to_cannibalism(ChoiceDestination,PossibleMoves,PossibleMovesUpdated),
-    % print("/1PossibleMovesafter"),
-    % print(PossibleMoves),
-    % nl,
-    % print("/2PossibleMovesafter"),
-    % print(PossibleMovesUpdated),
-    % nl,
-    % nl,
-    % nl,
+
+
+choose_move([[[X,Y,A,T]|PossibleChoices]|PossibleMoves],Board):-
+    add_move_piece([X,Y,A,T],PossibleChoices,Board),
     cpt(StepLeft),
     StepLeft < 4,
-    % print("fin1"),
-    choose_move(PossibleMovesUpdated).
-choose_move(_).
+    choose_move(PossibleMoves,Board).
+choose_move(_,_).
 
 % get_moves([[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[2,2]],[[1,2],[1,3]],[[0,0],[1,0]],[[0,0],[0,1]]], _, Board):-
 get_moves(Move, _, Board):-
+    % retractall(moves()),
+    % retractall(cpt()),
     get_all_moves(Board,PossibleMoves),
     asserta(moves([])),
+    retractall(cpt()),
     asserta(cpt(0)),
-    asserta(board(Board)),
-    choose_move(PossibleMoves),
+    choose_move(PossibleMoves,Board),
+    % add_move([[1,0],[2,0]]),
+    % add_move([[0,0],[1,0]]),
+    % add_move([[0,1],[0,0]]),
+    % add_move([[0,0],[0,1]]),
     moves(Move),
-    % moves(MoveInv),
-    % invList(MoveInv,Move),
-    retractall(cpt(_)),
-    retractall(board(_)),
     retractall(moves(_)).
+    % cpt(Cpt),
+    % retract(cpt(Cpt)).
 
+
+update_board([[X,Y],[NewX,NewY]], [[NewX,NewY,A,T]|Board]) :-
+    board(B),
+    removeElementList([X,Y,A,T],B, Board),
+    retract(board(B)),
+    asserta(board([[NewX,NewY,A,T]|B])).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-usefulTest(Res):-
-    staticBoard(StBoard),
-    get_all_moves(StBoard,PossibleMoves),
-    asserta(moves([])),
-    asserta(cpt(0)),
-    asserta(board(StBoard)),
-    print("|Yooooooooooo "),
-    nl,
-    print("|PossibleMoves "),
-    print(PossibleMoves),
-    nl,
-    choose_move(PossibleMoves),
-    moves(Res),
-    % moves(MoveInv),
-    % print("|MoveInv "),
-    % print(MoveInv),
-    % invList(MoveInv,Res),
-    % print("|Res "),
-    % print(Res),
-    print("|Yooooooooooo2 "),
-    nl,
-    nl,
-    retractall(cpt(_)),
-    retractall(board(_)),
-    retractall(moves(_)).
+usefulTest(Res):-   board(B),
+                    get_all_moves(B, Res).
+                    %asserta(moves([])),
+                    %asserta(cpt(0)),
+                    %choose_move(PossibleMoves),
+                    % add_move([[1,0],[2,0]]),
+                    % add_move([[0,0],[1,0]]),
+                    % add_move([[0,1],[0,0]]),
+                    % add_move([[0,0],[0,1]]),
+                    % choose_move(B,PossibleMoves,4),
+                    %moves(Move),
+                    %retract(moves(Move)),
+                    %cpt(Cpt),
+                    %retract(cpt(Cpt)).
+                    % print("Move2"),
+                    % print(Move).
 
 % get_moves(Move, Gamestate, Board):-
 %     get_all_moves(Board,PossibleMoves),
